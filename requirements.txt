@@ -1,0 +1,4 @@
+numpy==1.26.2
+pymongo==4.6.0
+autograd==1.6.2
+python-dotenv==1.0.0

@@ -1,0 +1,41 @@
+service: serverless-neuralnetwork
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  stage: prod
+  runtime: python3.9
+  region: ap-south-1
+  httpApi:
+    cors: true
+  environment:
+    URL_DB: ${env:URL_DB}
+
+package:
+  patterns:
+    - "!.vscode/**"
+    - "!node_modules/**"
+    - "!.env"
+    - "!README.md"
+    - "!package.json"
+    - "!package-lock.json"
+    - "!requirements.txt"
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+
+useDotenv: true
+
+plugins:
+  - serverless-python-requirements
+
+
+functions:
+  train:
+    handler: src.controllers.handler.train
+    timeout: 900
+    events:
+      - httpApi:
+          path: /train
+          method: post
