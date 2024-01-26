@@ -1,16 +1,18 @@
 # Serverless Neural Network
 
-Serverless Neural Network is a lightweight framework designed for deploying trainable neural networks on serverless platforms, specifically tailored for AWS Lambda. Traditional neural network libraries like PyTorch, TensorFlow, and JAX offer extensive functionality, but they come with the drawback of being heavy and resource-intensive. This framework focuses on simplicity and efficiency, allowing you to deploy a lightweight neural network directly to AWS Lambda without the need for dedicated servers or complex container setups.
+Serverless Neural Network is a lightweight framework designed for deploying trainable neural networks on serverless platforms, specifically tailored for AWS Lambda. Traditional neural network libraries like PyTorch, TensorFlow, and JAX offer extensive functionality, but they come with the drawback of being heavy and resource-intensive. This framework focuses on simplicity and efficiency, allowing you to deploy a lightweight neural network directly to AWS Lambda without the need for dedicated servers or complex container lambdas.
 
 ## Features
 
-**Lightweight Deployment:** Deploy simple neural networks on AWS Lambda without the need for dedicated servers or heavyweight containers.
+**Lightweight Deployment:** Deploy simple neural network on AWS Lambda without the need for dedicated servers or heavyweight containers.
 
 **Data Handling:** Easily save datapoints, train a network on the stored data, and persist the trained model to a database.
 
 **Inference Support:** Perform inferences using the trained network, making it suitable for real-time applications.
 
-**Database Integration:** Uses Pymongo for efficient database operations, reducing query times and improving overall performance.
+**Database Integration:** Uses Pymongo over Object-Document Mappers (ODMs) for efficient database operations, reducing query times and improving overall performance.
+
+**Optimized Size:** The framework is uses bare minimum external libraries to keep the package size small (24 MB).
 
 
 ## Prerequisites
@@ -63,11 +65,41 @@ Execute the following command to deploy the Serverless Neural Network:
 serverless deploy
 ```
 
-This command will package and deploy the framework to AWS Lambda, making it ready for use.
+This command will package and deploy the framework to AWS Lambda, with HTTP endpoints triggers.
 
 
 ## Usage
-// TODO
+
+After deployment, you will have three endpoints deployed at an API Gateway host (`xxx.execute-api.rrr.amazonaws.com`):
+
+* **/datapoint:** Use the following curl command to add data to your data points. This endpoint will add the datapoint to the database:
+
+```
+curl -X POST https://xxx.execute-api.rrr.amazonaws.com/datapoint \
+       -H "Content-Type: application/json" \
+       -d '{"x": [2.0, 3.0, -1.0], "y": 1}'
+```
+
+* **/train:** Use the following curl command to train your network. This endpoint will train on the datapoints stored in the database:
+
+```
+curl -X POST https://xxx.execute-api.rrr.amazonaws.com/train \
+     -H "Content-Type: application/json"
+```
+
+* **/infer:** Use the following curl command to get inferences for your given input:
+
+```
+curl -X POST https://xxx.execute-api.rrr.amazonaws.com/infer \
+     -H "Content-Type: application/json" \
+     -d '{"x": [2.0, 3.0, -1.0]}'
+```
+
+*Optional:* You can also pass a network_id to infer with a given version of the neural network:
+
+```
+curl -X POST https://xxx.execute-api.rrr.amazonaws.com/infer -H 'Content-Type: application/json'-d '{"x": [2.0, 3.0, -1.0], "network_id": "your_network_id"}'
+```
 
 ## Known Issues
 

@@ -46,3 +46,10 @@ functions:
       - httpApi:
           path: /train
           method: post
+
+  infer:
+    handler: src.controllers.handlers.infer
+    events:
+      - httpApi:
+          path: /infer
+          method: post

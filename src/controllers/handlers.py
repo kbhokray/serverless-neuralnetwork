@@ -62,9 +62,10 @@ def train(event, context):
 
 def infer(event, context):
     datapoint: dict[str, str] = json.loads(event.get("body", "{}"))
-    x = datapoint.get("x", [])
+    x: list = datapoint.get("x", [])  # type: ignore
+    network_id = datapoint.get("network_id")
     try:
-        response = ServerlessNeuralNetwork.infer(x)  # type: ignore
+        response = ServerlessNeuralNetwork.infer(x, network_id)
         return str(response)
     except AppException as ae:
         response = Response(
