@@ -1,5 +1,10 @@
 # %%
 import os
+import sys
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, parent_dir)
+
 import autograd.numpy as np  # type: ignore
 import numpy as onp
 import autograd.numpy.random as random  # type: ignore
@@ -12,6 +17,7 @@ from bson import ObjectId, Binary
 import pickle
 from typing import Union
 from entities.dbdocument import Document
+from utils import load_data
 
 np: onp  # type: ignore
 random: onp.random  # type: ignore
@@ -34,31 +40,25 @@ class Layer:
 
 
 class Dense(Layer):
-    def __init__(
-        self,
-        width: int,
-        W_std: float = 1.5,
-        b_std: float = 0.05,
-    ):
+    def __init__(self, width: int):
         self.width = width
-        self.W_std = W_std
-        self.b_std = b_std
 
     def init_fn(self, input_dim, randkey=None):
         self.input_dim = input_dim
-
+        # based on default initialization of pytorch linear layer
+        # https://github.com/pytorch/pytorch/blob/f8e14f3b46e68a5271a8c57ce749ad8057d77ddd/torch/nn/modules/linear.py#L105
+        gain = np.sqrt(2.0 / 6.0)
+        w_bound = gain * np.sqrt(3 / input_dim)
+        b_bound = np.sqrt(1 / input_dim)
         if randkey is not None:
             rng = np.random.RandomState(randkey)
-            W = rng.normal(size=(input_dim, self.width))
-            b = rng.normal(size=(self.width, 1))
+            W = rng.uniform(low=-w_bound, high=w_bound, size=(input_dim, self.width))
+            b = rng.uniform(low=-b_bound, high=b_bound, size=(self.width, 1))
         else:
-            W = random.normal(size=(input_dim, self.width))
-            b = random.normal(size=(self.width, 1))
+            W = random.uniform(low=-w_bound, high=w_bound, size=(input_dim, self.width))
+            b = random.uniform(low=-b_bound, high=b_bound, size=(self.width, 1))
 
-        return (
-            W * self.W_std / (input_dim**0.5),
-            b * self.b_std,
-        )
+        return (W, b)
 
     def apply_fn(self, params, x):
         W, b = params
@@ -126,8 +126,6 @@ class NeuralNetwork(Document):
     training_steps: int
     params_seed: int
     input_dim: int
-    W_std: float = 1.5
-    b_std: float = 0.05
     relu_alpha: float = 0.1
     init_params: list = field(default_factory=list)
     final_params: list = field(default_factory=list)
@@ -166,30 +164,14 @@ class NeuralNetwork(Document):
         return deserialized
 
     def model(self):
-        layers_list: list[Layer] = [
-            Dense(
-                width=self.width,
-                W_std=self.W_std,
-                b_std=self.b_std,
-            ),
-        ]
+        layers_list: list[Layer] = [Dense(width=self.width)]
         for _ in range(self.depth):
             layers_list += [
                 LeakyRelu(alpha=self.relu_alpha),
-                Dense(
-                    width=self.width,
-                    W_std=self.W_std,
-                    b_std=self.b_std,
-                ),
+                Dense(width=self.width),
             ]
 
-        layers_list += [
-            Dense(
-                width=1,
-                W_std=self.W_std,
-                b_std=self.b_std,
-            )
-        ]
+        layers_list += [Dense(width=1)]
 
         return serial(layers_list)
 
@@ -238,6 +220,10 @@ class NeuralNetwork(Document):
 
 
 if __name__ == "__main__":
+    # X_train, y_train, X_test, y_test = load_data()
+    # xs = X_train.T
+    # ys = np.array([y_train])
+
     xs = np.array(
         [
             [2.0, 3.0, -1.0],
@@ -262,6 +248,6 @@ if __name__ == "__main__":
         depth=1,
         training_steps=1000,
         params_seed=seed,
-        input_dim=3,
+        input_dim=len(xs),
     ).train((xs, ys))
 # %%

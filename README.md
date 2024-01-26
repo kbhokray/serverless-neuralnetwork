@@ -103,6 +103,8 @@ curl -X POST https://xxx.execute-api.rrr.amazonaws.com/infer -H 'Content-Type: a
 
 ## Known Issues
 
+⚠️ The neural network in this framework is being optimized and is currently highly untested. It may not perform reliably in all scenarios. Please exercise caution if you plan on using it for production.
+
 * Loss Explosion:
 
 The loss may explode in some cases due to suboptimal initialization
@@ -124,9 +126,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 While the future support of this project is uncertain, anyone is welcome to fork and use this framework to build their own codebase. Feel free to customize and extend it based on your requirements.
 
 **Note:** The framework is currently in active development, and additional features and improvements are planned. Stay tuned for updates!
-
-
-
-
-
-
