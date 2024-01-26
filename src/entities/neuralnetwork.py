@@ -10,19 +10,11 @@ from enum import Enum
 from datetime import datetime
 from bson import ObjectId, Binary
 import pickle
-from pymongo import MongoClient
-from dotenv import load_dotenv
 from typing import Union
+from entities.dbdocument import Document
 
 np: onp  # type: ignore
 random: onp.random  # type: ignore
-
-
-load_dotenv()
-
-URL_DB = os.environ.get("URL_DB", "")
-client = MongoClient(URL_DB)
-db = client[URL_DB.split("/")[-1].split("?")[0]]
 
 
 # activation functions
@@ -126,7 +118,7 @@ def serial(layers: list[Layer]):
 
 
 @dataclass
-class NeuralNetwork:
+class NeuralNetwork(Document):
     learning_rate: float
     activation_fn: ActivationFn
     width: int
@@ -243,20 +235,6 @@ class NeuralNetwork:
         self.params_data = Binary(pickle.dumps(optimized_params, protocol=2))
 
         return optimized_params
-
-    def save(self):
-        collection = db[self.__col_name__]
-        result = collection.insert_one(
-            {
-                key: value.value if isinstance(value, Enum) else value
-                for key, value in self.__dict__.items()
-                if key not in set(self._NO_DB_FIELDS + ["_id"])
-                and not callable(self.__dict__[key])
-            }
-        )
-
-        self._id = result.inserted_id
-        return self
 
 
 if __name__ == "__main__":

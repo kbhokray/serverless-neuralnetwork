@@ -32,8 +32,15 @@ plugins:
 
 
 functions:
+  save_datapoint:
+    handler: src.controllers.handlers.save_datapoint
+    events:
+      - httpApi:
+          path: /datapoint
+          method: post
+
   train:
-    handler: src.controllers.handler.train
+    handler: src.controllers.handlers.train
     timeout: 900
     events:
       - httpApi:
