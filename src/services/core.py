@@ -96,7 +96,7 @@ class ServerlessNeuralNetwork:
             learning_rate=0.001,
             activation_fn=ActivationFn.LEAKYRELU,
             width=3,
-            depth=1,
+            depth=3,
             training_steps=1000,
             params_seed=np.random.randint(3),
             input_dim=len(xs),

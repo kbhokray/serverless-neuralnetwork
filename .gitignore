@@ -3,6 +3,8 @@ __pycache__
 
 node_modules/
 
+notebooks/
+
 # Distribution / packaging
 .Python
 env/

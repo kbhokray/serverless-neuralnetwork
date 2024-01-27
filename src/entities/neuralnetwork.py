@@ -81,22 +81,6 @@ class LeakyRelu(Layer):
         return np.maximum(self.alpha * x, x)
 
 
-class LayerNormalization(Layer):
-    def __init__(self, epsilon=1e-5):
-        super().__init__()
-        self.epsilon = epsilon
-
-    def init_fn(self, input_dim, randkey):
-        self.width = input_dim
-        return ()
-
-    def apply_fn(self, params, x):
-        mean = np.mean(x, axis=0, keepdims=True)
-        variance = np.var(x, axis=0, keepdims=True)
-        x_normalized = (x - mean) / np.sqrt(variance + self.epsilon)
-        return x_normalized
-
-
 def serial(layers: list[Layer]):
     init_params = []
 
@@ -220,32 +204,17 @@ class NeuralNetwork(Document):
 
 
 if __name__ == "__main__":
-    # X_train, y_train, X_test, y_test = load_data()
-    # xs = X_train.T
-    # ys = np.array([y_train])
-
-    xs = np.array(
-        [
-            [2.0, 3.0, -1.0],
-            [3.0, -1.0, 0.5],
-            [0.5, 1.0, 1.0],
-            [1.0, 1.0, -1.0],
-            [2.0, 3.0, -1.0],
-            [3.0, -1.0, 0.5],
-            [0.5, 1.0, 1.0],
-            [1.0, 1.0, -1.0],
-        ]
-    ).T
-
-    ys = np.array([[1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0]])
+    X_train, y_train, X_test, y_test = load_data()
+    xs = X_train[0:1, :].T
+    ys = np.array([y_train[0:1]])
 
     seed = random.randint(0, 1000)
     print(f"Using {seed=}")
     NeuralNetwork(
-        learning_rate=0.001,
+        learning_rate=0.01,
         activation_fn=ActivationFn.LEAKYRELU,
         width=3,
-        depth=1,
+        depth=3,
         training_steps=1000,
         params_seed=seed,
         input_dim=len(xs),

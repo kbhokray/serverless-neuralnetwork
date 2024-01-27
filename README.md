@@ -101,6 +101,8 @@ curl -X POST https://xxx.execute-api.rrr.amazonaws.com/infer \
 curl -X POST https://xxx.execute-api.rrr.amazonaws.com/infer -H 'Content-Type: application/json'-d '{"x": [2.0, 3.0, -1.0], "network_id": "your_network_id"}'
 ```
 
+* **Testing Locally:** To test the handlers locally, navigate to `src/controllers/handler.py` and run the file. For testing the neural network, go to `src/entities/neuralnetwork.py` and run the file. Ensure you have the necessary dependencies installed before running the files locally. You can check the `requirements.txt` file for the required packages.
+
 ## Known Issues
 
 ⚠️ The neural network in this framework is being optimized and is currently highly untested. It may not perform reliably in all scenarios. Please exercise caution if you plan on using it for production.
