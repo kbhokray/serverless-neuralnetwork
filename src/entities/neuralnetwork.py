@@ -8,7 +8,7 @@ sys.path.insert(0, parent_dir)
 import autograd.numpy as np  # type: ignore
 import numpy as onp
 import autograd.numpy.random as random  # type: ignore
-from autograd.misc.optimizers import sgd
+from autograd.misc.optimizers import adam
 from autograd import grad
 from dataclasses import dataclass, field
 from enum import Enum
@@ -148,11 +148,14 @@ class NeuralNetwork(Document):
         return deserialized
 
     def model(self):
-        layers_list: list[Layer] = [Dense(width=self.width)]
+        layers_list: list[Layer] = [
+            Dense(width=self.width),
+            LeakyRelu(alpha=self.relu_alpha),
+        ]
         for _ in range(self.depth):
             layers_list += [
-                LeakyRelu(alpha=self.relu_alpha),
                 Dense(width=self.width),
+                LeakyRelu(alpha=self.relu_alpha),
             ]
 
         layers_list += [Dense(width=1)]
@@ -190,7 +193,7 @@ class NeuralNetwork(Document):
             # print("{:15}".format(iter // 10))
             pass
 
-        optimized_params = sgd(
+        optimized_params = adam(
             grad_loss,
             self.init_params,
             num_iters=self.training_steps,

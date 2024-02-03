@@ -121,7 +121,7 @@ Work is in progress to add support to both the issues.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
 
 ## Forking and Usage
 

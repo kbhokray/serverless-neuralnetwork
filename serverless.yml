@@ -15,6 +15,7 @@ package:
   patterns:
     - "!.vscode/**"
     - "!node_modules/**"
+    - "!notebooks/**"
     - "!data/**"
     - "!.env"
     - "!README.md"
