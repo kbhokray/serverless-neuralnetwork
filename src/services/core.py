@@ -140,7 +140,7 @@ class ServerlessNeuralNetwork:
 
         input = np.array(x if isinstance(x[0], list) else [x]).T
 
-        preds = network.predict_fn(params=network.final_params, input=input)
+        preds = network.predict_fn(params=network.params, input=input)
 
         ret_val = preds.tolist() if preds is not None else None
 
@@ -148,3 +148,21 @@ class ServerlessNeuralNetwork:
             statusCode=ResponseStatusCode.SUCCESS,
             result={"Predictions": ret_val},
         )
+
+    @staticmethod
+    def get_network(
+        network_id: str,
+    ):
+        if not network_id:
+            logger.error("Illegal data: network_id cannot be empty")
+            raise AppException("Illegal data: network_id cannot be empty")
+
+        network: Union[NeuralNetwork, None] = NeuralNetwork.find_one(
+            {"_id": network_id}
+        )
+
+        if not network:
+            logger.error("Cannot find network in DB")
+            raise AppException("Cannot find network in DB")
+
+        return network.serialize_params()
